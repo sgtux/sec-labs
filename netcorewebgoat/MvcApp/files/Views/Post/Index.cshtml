@@ -1,0 +1,64 @@
+@model System.Collections.Generic.List<NetCoreWebGoat.Models.PostModelList>
+
+<div style="text-align: center">
+    <input id="txtSearch" value="@ViewBag.Search" style="margin: 10px" /><button onclick="searchPosts()"
+        class="btn btn-primary">Search</button><br />
+    <span>Results for: '@Html.Raw(ViewBag.Search)'<span>
+</div>
+@foreach (var item in Model)
+{
+    <div class="post-card">
+    <div class="post-card-header">
+        <div class="post-user-box">
+            <img class="post-profile-image" alt="" src='~/upload/@(item.UserPhoto ?? "profile-default.jpg")' />
+            <div>
+                <h4>@item.UserName @item.UserLastName</h4>
+                <span>@item.CreatedAtFormatted</span>
+            </div>
+        </div>
+        @if (item.Owner)
+            {
+                <div>
+                    <button class="btn btn-danger" onclick="removePost(@item.Id)">
+                        <em class="fa fa-trash"></em>
+                    </button>
+                </div>
+            }
+        </div>
+        <div class="post-card-body">
+            <h6>@Html.Raw(item.Text)</h6>
+            <img src="~/upload/@item.Photo" alt="" />
+        </div>        
+        <hr />
+        <div class="post-footer">
+            Comments:
+            @foreach(var comment in item.Comments)
+            {
+                <div class="comment-box">
+                    <img class="post-profile-image" alt="" src="/upload/@comment.Author.Photo">
+                    <div style="margin-left: 10px">
+                        <div>
+                            <span style="font-size:20px;font-weight: bold">@comment.Author.FullName</span>
+                            <span style="font-size:12px">@comment.CreatedAt</span>
+                            @if(comment.Owner)
+                            {
+                                <em class="fas fa-trash-alt btn-remove-comment" onclick="removeComment(@comment.Id)"></em>
+                            }
+                        </div>
+                        <span>@comment.Text</span>
+                    </div>
+                </div>
+            }
+            @if(User.Identity.IsAuthenticated)
+            {
+                <div class="new-comment-box">
+                    <input id="comment-text-@item.Id" placeholder="Write a comment..." />
+                    <button class="btn-send" onclick="sendComment(@item.Id)">SEND</button>
+                </div>
+            }
+        </div>
+    </div>
+}
+<div class="box-float">
+    <a href="/Post/Create" class="btn btn-success">New Post</a><br />
+</div>
